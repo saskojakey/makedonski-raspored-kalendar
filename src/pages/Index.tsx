@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Calendar from '@/components/Calendar';
 import CourseForm from '@/components/CourseForm';
@@ -9,6 +10,7 @@ import ProfilePage from '@/components/ProfilePage';
 import NotificationCenter from '@/components/NotificationCenter';
 import TodayView from '@/components/TodayView';
 import QuickNav from '@/components/QuickNav';
+import MobileSidebar from '@/components/MobileSidebar';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
