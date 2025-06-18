@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Plus, ZoomIn, ZoomOut } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useGestures } from '@/hooks/useGestures';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile} from "@/hooks/use-mobile.tsx";
+
 import DayDetailModal from './DayDetailModal';
 import CourseDetailModal from './CourseDetailModal';
 
@@ -26,7 +27,7 @@ interface CalendarProps {
 
 const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }: CalendarProps) => {
   const { t } = useTranslation();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<'day' | 'week' | 'month'>(isMobile ? 'day' : 'month');
   const [zoomLevel, setZoomLevel] = useState(1);
