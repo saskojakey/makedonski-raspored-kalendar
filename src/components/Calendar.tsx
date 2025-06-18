@@ -1,10 +1,12 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Plus, ZoomIn, ZoomOut } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useGestures } from '@/hooks/useGestures';
+import { useMobile } from '@/hooks/use-mobile';
+import DayDetailModal from './DayDetailModal';
+import CourseDetailModal from './CourseDetailModal';
 
 interface CalendarEvent {
   id: string;
@@ -18,13 +20,20 @@ interface CalendarEvent {
 interface CalendarProps {
   events: CalendarEvent[];
   onCreateEvent: () => void;
+  courses?: any[];
+  onAddStudentToCourse?: (courseId: string, studentId: string) => void;
 }
 
-const Calendar = ({ events, onCreateEvent }: CalendarProps) => {
+const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }: CalendarProps) => {
   const { t } = useTranslation();
+  const isMobile = useMobile();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [view, setView] = useState<'day' | 'week' | 'month'>('month');
+  const [view, setView] = useState<'day' | 'week' | 'month'>(isMobile ? 'day' : 'month');
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isDayModalOpen, setIsDayModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
 
   const monthNames = [
     'Јануари', 'Февруари', 'Март', 'Април', 'Мај', 'Јуни',
@@ -114,43 +123,90 @@ const Calendar = ({ events, onCreateEvent }: CalendarProps) => {
     });
   };
 
-  const renderDayView = () => {
+  const handleDayClick = (day: number) => {
+    const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    setSelectedDate(clickedDate);
+    setIsDayModalOpen(true);
+  };
+
+  const handleEventClick = (event: CalendarEvent, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const course = courses.find(c => c.id === event.courseId);
+    if (course) {
+      setSelectedCourse(course);
+      setIsCourseModalOpen(true);
+    }
+  };
+
+  const handleAddStudentToCourse = (courseId: string, studentId: string) => {
+    if (onAddStudentToCourse) {
+      onAddStudentToCourse(courseId, studentId);
+    }
+  };
+
+  // Mobile day view with agenda-style layout
+  const renderMobileDayView = () => {
     const today = new Date();
-    const todayEvents = getEventsForDay(today.getDate());
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const dayAfter = new Date(today);
+    dayAfter.setDate(today.getDate() + 2);
     
+    const days = [
+      { date: today, label: 'Денес' },
+      { date: tomorrow, label: 'Утре' },
+      { date: dayAfter, label: 'Задутре' }
+    ];
+
     return (
       <div className="space-y-4">
-        <div className="text-center">
-          <h3 className="text-xl font-bold">
-            {today.getDate()} {monthNames[today.getMonth()]}
-          </h3>
-          <p className="text-gray-600">Денешни часови</p>
-        </div>
-        <div className="space-y-3">
-          {todayEvents.map(event => (
-            <div
-              key={event.id}
-              className="p-4 rounded-lg border-l-4 bg-white shadow-sm"
-              style={{ borderLeftColor: event.color }}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-semibold">{event.title}</h4>
-                  <p className="text-sm text-gray-600">{event.time}</p>
-                </div>
-                <div 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: event.color }}
-                />
-              </div>
-            </div>
-          ))}
-          {todayEvents.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <p>Немате планирани часови денес</p>
-            </div>
-          )}
-        </div>
+        {days.map((day, index) => {
+          const dayEvents = events.filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate.toDateString() === day.date.toDateString();
+          });
+
+          return (
+            <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow" 
+                  onClick={() => handleDayClick(day.date.getDate())}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <span>{day.label}</span>
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {day.date.getDate()}/{day.date.getMonth() + 1}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {dayEvents.length > 0 ? (
+                  <div className="space-y-2">
+                    {dayEvents.map(event => (
+                      <div
+                        key={event.id}
+                        className="flex items-center gap-3 p-2 rounded-lg border-l-4 bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors"
+                        style={{ borderLeftColor: event.color }}
+                        onClick={(e) => handleEventClick(event, e)}
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{event.title}</p>
+                          <p className="text-xs text-muted-foreground">{event.time}</p>
+                        </div>
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: event.color }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    Нема планирани часови
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     );
   };
@@ -175,7 +231,8 @@ const Calendar = ({ events, onCreateEvent }: CalendarProps) => {
           });
           
           return (
-            <div key={index} className="border rounded-lg p-2 min-h-[120px]">
+            <div key={index} className="border rounded-lg p-2 min-h-[120px] cursor-pointer hover:bg-gray-50 transition-colors"
+                 onClick={() => handleDayClick(day.getDate())}>
               <div className={`text-center font-medium mb-2 ${
                 day.toDateString() === new Date().toDateString() 
                   ? 'text-blue-600 bg-blue-50 rounded px-2 py-1' 
@@ -188,8 +245,9 @@ const Calendar = ({ events, onCreateEvent }: CalendarProps) => {
                 {dayEvents.map(event => (
                   <div
                     key={event.id}
-                    className="text-xs p-1 rounded text-white truncate"
+                    className="text-xs p-1 rounded text-white truncate cursor-pointer hover:opacity-80"
                     style={{ backgroundColor: event.color }}
+                    onClick={(e) => handleEventClick(event, e)}
                   >
                     {event.time}
                   </div>
@@ -218,9 +276,10 @@ const Calendar = ({ events, onCreateEvent }: CalendarProps) => {
           {days.map((day, index) => (
             <div
               key={index}
-              className={`min-h-[80px] md:min-h-[100px] p-2 border rounded-lg transition-colors hover:bg-gray-50 touch-manipulation ${
+              className={`min-h-[80px] md:min-h-[100px] p-2 border rounded-lg transition-colors hover:bg-gray-50 touch-manipulation cursor-pointer ${
                 day && isToday(day) ? 'bg-blue-50 border-blue-200' : 'border-gray-200'
               }`}
+              onClick={() => day && handleDayClick(day)}
             >
               {day && (
                 <>
@@ -233,8 +292,9 @@ const Calendar = ({ events, onCreateEvent }: CalendarProps) => {
                     {getEventsForDay(day).slice(0, 2).map(event => (
                       <div
                         key={event.id}
-                        className="text-xs p-1 rounded text-white truncate"
+                        className="text-xs p-1 rounded text-white truncate cursor-pointer hover:opacity-80"
                         style={{ backgroundColor: event.color }}
+                        onClick={(e) => handleEventClick(event, e)}
                       >
                         {event.time}
                       </div>
@@ -255,92 +315,115 @@ const Calendar = ({ events, onCreateEvent }: CalendarProps) => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <CardTitle className="text-xl sm:text-2xl font-bold">
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </CardTitle>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateMonth('prev')}
-              className="hover:scale-110 transition-transform"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateMonth('next')}
-              className="hover:scale-110 transition-transform"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <div className="flex items-center gap-1">
-            <Button
-              variant={view === 'day' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setView('day')}
-              className="hover:scale-105 transition-transform"
-            >
-              Ден
-            </Button>
-            <Button
-              variant={view === 'week' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setView('week')}
-              className="hover:scale-105 transition-transform"
-            >
-              Недела
-            </Button>
-            <Button
-              variant={view === 'month' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setView('month')}
-              className="hover:scale-105 transition-transform"
-            >
-              Месец
-            </Button>
+    <>
+      <Card className="w-full">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <CardTitle className="text-xl sm:text-2xl font-bold">
+              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+            </CardTitle>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateMonth('prev')}
+                className="hover:scale-110 transition-transform"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateMonth('next')}
+                className="hover:scale-110 transition-transform"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           
-          <Button 
-            onClick={onCreateEvent} 
-            className="hover:scale-105 transition-transform bg-gradient-to-r from-blue-500 to-purple-600"
-            size="sm"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Додај
-          </Button>
-        </div>
-      </CardHeader>
-      
-      <CardContent 
-        className="touch-manipulation"
-        {...gestureHandlers}
-        style={{ touchAction: 'manipulation' }}
-      >
-        {/* Zoom indicator for mobile */}
-        <div className="md:hidden flex justify-center mb-4">
-          <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            <ZoomOut className="h-3 w-3" />
-            <span>Притисни и повлечи за зум</span>
-            <ZoomIn className="h-3 w-3" />
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {!isMobile && (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant={view === 'day' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setView('day')}
+                  className="hover:scale-105 transition-transform"
+                >
+                  Ден
+                </Button>
+                <Button
+                  variant={view === 'week' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setView('week')}
+                  className="hover:scale-105 transition-transform"
+                >
+                  Недела
+                </Button>
+                <Button
+                  variant={view === 'month' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setView('month')}
+                  className="hover:scale-105 transition-transform"
+                >
+                  Месец
+                </Button>
+              </div>
+            )}
+            
+            <Button 
+              onClick={onCreateEvent} 
+              className="hover:scale-105 transition-transform bg-gradient-to-r from-blue-500 to-purple-600"
+              size="sm"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Додај
+            </Button>
           </div>
-        </div>
+        </CardHeader>
         
-        <div className="transition-all duration-300 ease-in-out">
-          {view === 'day' && renderDayView()}
-          {view === 'week' && renderWeekView()}
-          {view === 'month' && renderMonthView()}
-        </div>
-      </CardContent>
-    </Card>
+        <CardContent 
+          className="touch-manipulation"
+          {...gestureHandlers}
+          style={{ touchAction: 'manipulation' }}
+        >
+          {isMobile && (
+            <div className="flex justify-center mb-4">
+              <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                <ZoomOut className="h-3 w-3" />
+                <span>Притисни и повлечи за зум</span>
+                <ZoomIn className="h-3 w-3" />
+              </div>
+            </div>
+          )}
+          
+          <div className="transition-all duration-300 ease-in-out">
+            {isMobile ? renderMobileDayView() : (
+              <>
+                {view === 'day' && renderMobileDayView()}
+                {view === 'week' && renderWeekView()}
+                {view === 'month' && renderMonthView()}
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <DayDetailModal
+        isOpen={isDayModalOpen}
+        onClose={() => setIsDayModalOpen(false)}
+        selectedDate={selectedDate}
+        events={events}
+      />
+
+      <CourseDetailModal
+        course={selectedCourse}
+        isOpen={isCourseModalOpen}
+        onClose={() => setIsCourseModalOpen(false)}
+        onAddStudent={handleAddStudentToCourse}
+      />
+    </>
   );
 };
 

@@ -52,7 +52,7 @@ const AppHeader = ({
               )}
             </div>
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => onNavigate('settings')}>
             <Settings className="h-4 w-4" />
           </Button>
           <Avatar className="cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all" onClick={() => onNavigate('profile')}>

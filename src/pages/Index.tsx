@@ -34,6 +34,12 @@ const Index = () => {
     setShowCourseForm
   } = useAppState();
 
+  const handleAddStudentToCourse = (courseId: string, studentId: string) => {
+    // Mock implementation - in a real app, this would update the backend
+    console.log(`Adding student ${studentId} to course ${courseId}`);
+    // You can implement the actual logic here based on your state management
+  };
+
   // Authentication flow
   if (!isAuthenticated) {
     if (showWelcome) {
@@ -57,6 +63,8 @@ const Index = () => {
   if (currentView === 'notifications') {
     return <NotificationCenter onBack={() => handleNavigate('calendar')} />;
   }
+
+  // Settings view is now handled in MainContent
 
   // Main app layout
   return (
@@ -82,9 +90,15 @@ const Index = () => {
             currentView={currentView}
             events={events}
             todayEvents={todayEvents}
+            courses={courses}
+            userProfile={userProfile}
+            language={language}
             onCreateCourse={handleCreateCourse}
             onCreateEvent={() => setShowCourseForm(true)}
             onCancelCourseForm={() => setShowCourseForm(false)}
+            onNavigate={handleNavigate}
+            onLanguageChange={setLanguage}
+            onAddStudentToCourse={handleAddStudentToCourse}
           />
         </main>
 

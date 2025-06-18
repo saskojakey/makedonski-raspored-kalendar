@@ -3,16 +3,23 @@ import React from 'react';
 import Calendar from '@/components/Calendar';
 import CourseForm from '@/components/CourseForm';
 import TodayView from '@/components/TodayView';
-import { CalendarEvent, TodayEvent, Course } from '@/types';
+import SettingsPage from '@/components/SettingsPage';
+import { CalendarEvent, TodayEvent, Course, UserProfile } from '@/types';
 
 interface MainContentProps {
   showCourseForm: boolean;
   currentView: string;
   events: CalendarEvent[];
   todayEvents: TodayEvent[];
+  courses: Course[];
+  userProfile: UserProfile;
+  language: string;
   onCreateCourse: (courseData: Omit<Course, 'id'>) => void;
   onCreateEvent: () => void;
   onCancelCourseForm: () => void;
+  onNavigate: (view: string) => void;
+  onLanguageChange: (language: string) => void;
+  onAddStudentToCourse?: (courseId: string, studentId: string) => void;
 }
 
 const MainContent = ({
@@ -20,15 +27,32 @@ const MainContent = ({
   currentView,
   events,
   todayEvents,
+  courses,
+  userProfile,
+  language,
   onCreateCourse,
   onCreateEvent,
-  onCancelCourseForm
+  onCancelCourseForm,
+  onNavigate,
+  onLanguageChange,
+  onAddStudentToCourse
 }: MainContentProps) => {
   if (showCourseForm) {
     return (
       <CourseForm
         onSave={onCreateCourse}
         onCancel={onCancelCourseForm}
+      />
+    );
+  }
+
+  if (currentView === 'settings') {
+    return (
+      <SettingsPage
+        onBack={() => onNavigate('calendar')}
+        userProfile={userProfile}
+        language={language}
+        onLanguageChange={onLanguageChange}
       />
     );
   }
@@ -45,7 +69,9 @@ const MainContent = ({
   return (
     <Calendar
       events={events}
+      courses={courses}
       onCreateEvent={onCreateEvent}
+      onAddStudentToCourse={onAddStudentToCourse}
     />
   );
 };
