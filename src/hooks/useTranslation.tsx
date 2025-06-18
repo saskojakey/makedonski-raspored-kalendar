@@ -101,10 +101,16 @@ const translations = {
 };
 
 export const useTranslation = () => {
-  const [language, setLanguage] = useState<keyof typeof translations>('mk');
+  const [language, setLanguageState] = useState<keyof typeof translations>('mk');
 
   const t = (key: string): string => {
     return translations[language][key as keyof typeof translations[typeof language]] || key;
+  };
+
+  const setLanguage = (newLanguage: string) => {
+    if (newLanguage === 'mk' || newLanguage === 'en' || newLanguage === 'al') {
+      setLanguageState(newLanguage);
+    }
   };
 
   return {
