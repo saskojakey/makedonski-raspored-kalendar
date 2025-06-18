@@ -1,13 +1,19 @@
-
 import React, { useState } from 'react';
 import Calendar from '@/components/Calendar';
 import CourseForm from '@/components/CourseForm';
 import Sidebar from '@/components/Sidebar';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import PhoneAuth from '@/components/PhoneAuth';
+import WelcomeScreen from '@/components/WelcomeScreen';
+import ProfilePage from '@/components/ProfilePage';
+import NotificationCenter from '@/components/NotificationCenter';
+import TodayView from '@/components/TodayView';
+import QuickNav from '@/components/QuickNav';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, Settings } from 'lucide-react';
+import { User, Settings, Bell } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface Course {
   id: string;
@@ -26,8 +32,50 @@ interface CalendarEvent {
   courseId: string;
 }
 
+interface UserProfile {
+  name: string;
+  role: 'student' | 'teacher';
+  school: string;
+  subjects: string[];
+  yearGrade: string;
+  phoneNumber: string;
+  preferredLanguage: string;
+}
+
+interface TodayEvent {
+  id: string;
+  title: string;
+  time: string;
+  duration: string;
+  location?: string;
+  participants?: number;
+  color: string;
+  type: 'class' | 'meeting' | 'exam' | 'event';
+}
+
 const Index = () => {
   const { t, language, setLanguage } = useTranslation();
+  
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  
+  // Navigation state
+  const [currentView, setCurrentView] = useState('calendar');
+  
+  // User profile
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    name: 'Марко Петровски',
+    role: 'student',
+    school: 'ОУ "Гоце Делчев"',
+    subjects: [],
+    yearGrade: '9-А',
+    phoneNumber: '',
+    preferredLanguage: 'mk'
+  });
+
+  // Existing course and events state
   const [courses, setCourses] = useState<Course[]>([
     {
       id: '1',
@@ -64,8 +112,56 @@ const Index = () => {
     }
   ]);
 
+  // Today's events (mock data)
+  const [todayEvents] = useState<TodayEvent[]>([
+    {
+      id: '1',
+      title: 'Математика - Алгебра',
+      time: '08:00',
+      duration: '45 мин',
+      location: 'Сала 201',
+      participants: 25,
+      color: '#3B82F6',
+      type: 'class'
+    },
+    {
+      id: '2',
+      title: 'Историја - Македонски владетели',
+      time: '10:30',
+      duration: '45 мин',
+      location: 'Сала 105',
+      participants: 28,
+      color: '#10B981',
+      type: 'class'
+    },
+    {
+      id: '3',
+      title: 'Родителски состанок',
+      time: '16:00',
+      duration: '90 мин',
+      location: 'Голема сала',
+      participants: 15,
+      color: '#F59E0B',
+      type: 'meeting'
+    }
+  ]);
+
   const [showCourseForm, setShowCourseForm] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<string>();
+
+  // Mock notification count
+  const unreadNotifications = 2;
+
+  const handleAuthSuccess = (phone: string) => {
+    setPhoneNumber(phone);
+    setUserProfile(prev => ({ ...prev, phoneNumber: phone }));
+    setShowWelcome(true);
+  };
+
+  const handleWelcomeContinue = () => {
+    setShowWelcome(false);
+    setIsAuthenticated(true);
+  };
 
   const handleCreateCourse = (courseData: Omit<Course, 'id'>) => {
     const newCourse: Course = {
@@ -76,6 +172,45 @@ const Index = () => {
     setShowCourseForm(false);
   };
 
+  const handleNavigate = (view: string) => {
+    if (view === 'create') {
+      setShowCourseForm(true);
+      setCurrentView('calendar');
+    } else {
+      setCurrentView(view);
+      setShowCourseForm(false);
+    }
+  };
+
+  const handleUpdateProfile = (profile: UserProfile) => {
+    setUserProfile(profile);
+  };
+
+  // Authentication flow
+  if (!isAuthenticated) {
+    if (showWelcome) {
+      return <WelcomeScreen phoneNumber={phoneNumber} onContinue={handleWelcomeContinue} />;
+    }
+    return <PhoneAuth onAuthSuccess={handleAuthSuccess} />;
+  }
+
+  // Profile view
+  if (currentView === 'profile') {
+    return (
+      <ProfilePage
+        onBack={() => setCurrentView('calendar')}
+        userProfile={userProfile}
+        onUpdateProfile={handleUpdateProfile}
+      />
+    );
+  }
+
+  // Notifications view
+  if (currentView === 'notifications') {
+    return <NotificationCenter onBack={() => setCurrentView('calendar')} />;
+  }
+
+  // Main app layout
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <Sidebar 
@@ -93,7 +228,7 @@ const Index = () => {
                 EduКалендар
               </h1>
               <p className="text-sm text-muted-foreground">
-                Училишен календар за македонски училишта
+                Добредојдовте, {userProfile.name}
               </p>
             </div>
             
@@ -102,12 +237,25 @@ const Index = () => {
                 currentLanguage={language}
                 onLanguageChange={setLanguage}
               />
+              <Button variant="ghost" size="sm" onClick={() => setCurrentView('notifications')}>
+                <div className="relative">
+                  <Bell className="h-4 w-4" />
+                  {unreadNotifications > 0 && (
+                    <Badge 
+                      className="absolute -top-2 -right-2 h-4 w-4 p-0 flex items-center justify-center text-xs animate-bounce"
+                      variant="destructive"
+                    >
+                      {unreadNotifications}
+                    </Badge>
+                  )}
+                </div>
+              </Button>
               <Button variant="ghost" size="sm">
                 <Settings className="h-4 w-4" />
               </Button>
-              <Avatar>
+              <Avatar className="cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all" onClick={() => setCurrentView('profile')}>
                 <AvatarFallback>
-                  <User className="h-4 w-4" />
+                  {userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -121,6 +269,11 @@ const Index = () => {
               onSave={handleCreateCourse}
               onCancel={() => setShowCourseForm(false)}
             />
+          ) : currentView === 'today' ? (
+            <TodayView
+              events={todayEvents}
+              onCreateEvent={() => setShowCourseForm(true)}
+            />
           ) : (
             <Calendar
               events={events}
@@ -128,6 +281,14 @@ const Index = () => {
             />
           )}
         </main>
+
+        {/* Bottom Navigation */}
+        <QuickNav
+          onNavigate={handleNavigate}
+          currentView={currentView}
+          todayEventCount={todayEvents.length}
+          unreadNotifications={unreadNotifications}
+        />
       </div>
     </div>
   );

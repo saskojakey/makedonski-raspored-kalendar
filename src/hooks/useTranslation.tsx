@@ -29,6 +29,16 @@ const translations = {
     sendInvite: 'Испрати покана',
     pendingInvites: 'Покани во очекување',
     
+    // Authentication & Profile
+    welcome: 'Добредојдовте',
+    profile: 'Профил',
+    name: 'Име',
+    role: 'Улога',
+    school: 'Училиште',
+    student: 'Ученик',
+    teacher: 'Наставник',
+    notifications: 'Известувања',
+    
     // General
     loading: 'Се вчитува...',
     error: 'Грешка',
@@ -61,6 +71,16 @@ const translations = {
     sendInvite: 'Send Invite',
     pendingInvites: 'Pending Invites',
     
+    // Authentication & Profile
+    welcome: 'Welcome',
+    profile: 'Profile',
+    name: 'Name',
+    role: 'Role',
+    school: 'School',
+    student: 'Student',
+    teacher: 'Teacher',
+    notifications: 'Notifications',
+    
     // General
     loading: 'Loading...',
     error: 'Error',
@@ -92,6 +112,16 @@ const translations = {
     phoneNumber: 'Numri i Telefonit',
     sendInvite: 'Dërgo Ftesë',
     pendingInvites: 'Ftesa në Pritje',
+    
+    // Authentication & Profile
+    welcome: 'Mirë se vini',
+    profile: 'Profili',
+    name: 'Emri',
+    role: 'Roli',
+    school: 'Shkolla',
+    student: 'Student',
+    teacher: 'Mësues',
+    notifications: 'Njoftimet',
     
     // General
     loading: 'Duke u ngarkuar...',
