@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Calendar, Clock, Bell } from 'lucide-react';
+import { Calendar, Clock, Bell, CheckCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface Course {
@@ -23,10 +23,21 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
   const { t } = useTranslation();
 
   return (
-    <div className="w-80 bg-gray-50 p-6 overflow-y-auto">
+    <div className="w-80 bg-gradient-to-b from-blue-50 to-green-50 p-6 overflow-y-auto border-r border-blue-200">
       <div className="space-y-6">
+        <div className="flex items-center gap-3 mb-6">
+          <img 
+            src="/lovable-uploads/fe60a9bb-9daf-411c-b439-53d4805a9306.png" 
+            alt="TaskFlow" 
+            className="h-8 w-8 rounded-lg"
+          />
+          <h2 className="text-lg font-semibold taskflow-text-gradient">
+            TaskFlow
+          </h2>
+        </div>
+
         <div>
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-blue-700">
             <Calendar className="h-5 w-5" />
             {t('courses')}
           </h2>
@@ -34,19 +45,22 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
             {courses.map(course => (
               <Card 
                 key={course.id}
-                className={`p-3 cursor-pointer transition-all hover:shadow-md ${
-                  selectedCourseId === course.id ? 'ring-2 ring-blue-500' : ''
+                className={`p-3 cursor-pointer transition-all hover:shadow-md border-2 hover:scale-102 ${
+                  selectedCourseId === course.id 
+                    ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50' 
+                    : 'border-blue-200 hover:border-blue-300'
                 }`}
                 onClick={() => onCourseSelect(course.id)}
               >
                 <div className="flex items-center gap-3">
                   <div 
-                    className="w-4 h-4 rounded-full"
+                    className="w-4 h-4 rounded-full shadow-sm"
                     style={{ backgroundColor: course.color }}
                   />
                   <div className="flex-1">
-                    <h3 className="font-medium text-sm">{course.name}</h3>
-                    <p className="text-xs text-muted-foreground">
+                    <h3 className="font-medium text-sm text-blue-900">{course.name}</h3>
+                    <p className="text-xs text-blue-600 flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3" />
                       {course.students.length} студенти
                     </p>
                   </div>
@@ -54,42 +68,62 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
               </Card>
             ))}
             {courses.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Немате креирано курсеви
-              </p>
+              <div className="text-center py-8 bg-white/50 rounded-lg border border-blue-200">
+                <Calendar className="h-8 w-8 mx-auto mb-2 text-blue-400" />
+                <p className="text-sm text-blue-600">
+                  Немате креирано курсеви
+                </p>
+              </div>
             )}
           </div>
         </div>
 
         <div>
-          <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-medium mb-3 flex items-center gap-2 text-green-700">
             <Clock className="h-4 w-4" />
             {t('thisWeek')}
           </h3>
           <div className="space-y-2">
-            <div className="text-xs text-muted-foreground p-2 bg-white rounded border">
-              Понеделник - Математика (10:00)
+            <div className="text-xs p-3 bg-white rounded-lg border border-green-200 shadow-sm">
+              <div className="flex items-center gap-2 text-green-700">
+                <CheckCircle className="h-3 w-3" />
+                Понеделник - Математика (10:00)
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground p-2 bg-white rounded border">
-              Среда - Историја (14:00)
+            <div className="text-xs p-3 bg-white rounded-lg border border-green-200 shadow-sm">
+              <div className="flex items-center gap-2 text-green-700">
+                <CheckCircle className="h-3 w-3" />
+                Среда - Историја (14:00)
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground p-2 bg-white rounded border">
-              Петок - Биологија (11:30)
+            <div className="text-xs p-3 bg-white rounded-lg border border-green-200 shadow-sm">
+              <div className="flex items-center gap-2 text-green-700">
+                <CheckCircle className="h-3 w-3" />
+                Петок - Биологија (11:30)
+              </div>
             </div>
           </div>
         </div>
 
         <div>
-          <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-medium mb-3 flex items-center gap-2 text-red-600">
             <Bell className="h-4 w-4" />
             Известувања
           </h3>
           <div className="space-y-2">
-            <div className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
-              <span className="font-medium">Марко П.</span> прифати покана за Математика
+            <div className="text-xs p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-3 w-3 text-blue-500" />
+                <span className="font-medium text-blue-700">Марко П.</span>
+                <span className="text-blue-600">прифати покана за Математика</span>
+              </div>
             </div>
-            <div className="text-xs p-2 bg-green-50 rounded border border-green-200">
-              <span className="font-medium">Ана С.</span> прифати покана за Историја
+            <div className="text-xs p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                <span className="font-medium text-green-700">Ана С.</span>
+                <span className="text-green-600">прифати покана за Историја</span>
+              </div>
             </div>
           </div>
         </div>
