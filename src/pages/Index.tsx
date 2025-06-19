@@ -40,6 +40,12 @@ const Index = () => {
     // You can implement the actual logic here based on your state management
   };
 
+  const handleRemoveStudentFromCourse = (courseId: string, studentId: string) => {
+    // Mock implementation - in a real app, this would update the backend
+    console.log(`Removing student ${studentId} from course ${courseId}`);
+    // You can implement the actual logic here based on your state management
+  };
+
   // Authentication flow
   if (!isAuthenticated) {
     if (showWelcome) {
@@ -73,6 +79,7 @@ const Index = () => {
         courses={courses}
         onCourseSelect={setSelectedCourseId}
         selectedCourseId={selectedCourseId}
+        onAddStudentToCourse={handleAddStudentToCourse}
       />
       
       <div className="flex-1 flex flex-col">
@@ -99,6 +106,7 @@ const Index = () => {
             onNavigate={handleNavigate}
             onLanguageChange={setLanguage}
             onAddStudentToCourse={handleAddStudentToCourse}
+            onRemoveStudentFromCourse={handleRemoveStudentFromCourse}
           />
         </main>
 

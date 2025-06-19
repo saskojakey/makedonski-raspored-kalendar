@@ -20,6 +20,7 @@ interface MainContentProps {
   onNavigate: (view: string) => void;
   onLanguageChange: (language: string) => void;
   onAddStudentToCourse?: (courseId: string, studentId: string) => void;
+  onRemoveStudentFromCourse?: (courseId: string, studentId: string) => void;
 }
 
 const MainContent = ({
@@ -35,7 +36,8 @@ const MainContent = ({
   onCancelCourseForm,
   onNavigate,
   onLanguageChange,
-  onAddStudentToCourse
+  onAddStudentToCourse,
+  onRemoveStudentFromCourse
 }: MainContentProps) => {
   if (showCourseForm) {
     return (
@@ -72,6 +74,7 @@ const MainContent = ({
       courses={courses}
       onCreateEvent={onCreateEvent}
       onAddStudentToCourse={onAddStudentToCourse}
+      onRemoveStudentFromCourse={onRemoveStudentFromCourse}
     />
   );
 };

@@ -23,13 +23,14 @@ interface CalendarProps {
   onCreateEvent: () => void;
   courses?: any[];
   onAddStudentToCourse?: (courseId: string, studentId: string) => void;
+  onRemoveStudentFromCourse?: (courseId: string, studentId: string) => void;
 }
 
-const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }: CalendarProps) => {
+const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse, onRemoveStudentFromCourse }: CalendarProps) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [view, setView] = useState<'day' | 'week' | 'month'>(isMobile ? 'day' : 'month');
+  const [view, setView] = useState<'day' | 'week' | 'month'>('week'); // Default to week
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isDayModalOpen, setIsDayModalOpen] = useState(false);
@@ -58,9 +59,17 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
   // Handle swipe gestures for navigation
   const handleSwipe = (direction: 'left' | 'right' | 'up' | 'down') => {
     if (direction === 'left') {
-      navigateMonth('next');
+      if (view === 'week') {
+        navigateWeek('next');
+      } else {
+        navigateMonth('next');
+      }
     } else if (direction === 'right') {
-      navigateMonth('prev');
+      if (view === 'week') {
+        navigateWeek('prev');
+      } else {
+        navigateMonth('prev');
+      }
     }
   };
 
@@ -104,6 +113,18 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
     });
   };
 
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      if (direction === 'prev') {
+        newDate.setDate(prev.getDate() - 7);
+      } else {
+        newDate.setDate(prev.getDate() + 7);
+      }
+      return newDate;
+    });
+  };
+
   const isToday = (day: number) => {
     const today = new Date();
     return (
@@ -124,8 +145,13 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
     });
   };
 
-  const handleDayClick = (day: number) => {
-    const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+  const handleDayClick = (day: number | Date) => {
+    let clickedDate: Date;
+    if (day instanceof Date) {
+      clickedDate = day;
+    } else {
+      clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    }
     setSelectedDate(clickedDate);
     setIsDayModalOpen(true);
   };
@@ -142,6 +168,12 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
   const handleAddStudentToCourse = (courseId: string, studentId: string) => {
     if (onAddStudentToCourse) {
       onAddStudentToCourse(courseId, studentId);
+    }
+  };
+
+  const handleRemoveStudentFromCourse = (courseId: string, studentId: string) => {
+    if (onRemoveStudentFromCourse) {
+      onRemoveStudentFromCourse(courseId, studentId);
     }
   };
 
@@ -169,7 +201,7 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
 
           return (
             <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow" 
-                  onClick={() => handleDayClick(day.date.getDate())}>
+                  onClick={() => handleDayClick(day.date)}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center justify-between">
                   <span>{day.label}</span>
@@ -212,9 +244,11 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
     );
   };
 
-  const renderWeekView = () => {
+  const getWeekDates = () => {
     const weekStart = new Date(currentDate);
-    weekStart.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+    const day = weekStart.getDay();
+    const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1); // Monday start
+    weekStart.setDate(diff);
     
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
@@ -222,41 +256,88 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
       day.setDate(weekStart.getDate() + i);
       weekDays.push(day);
     }
+    return weekDays;
+  };
+
+  const renderWeekView = () => {
+    const weekDays = getWeekDates();
 
     return (
-      <div className="grid grid-cols-7 gap-2">
-        {weekDays.map((day, index) => {
-          const dayEvents = events.filter(event => {
-            const eventDate = new Date(event.date);
-            return eventDate.toDateString() === day.toDateString();
-          });
+      <div className="space-y-4">
+        {/* Week navigation */}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigateWeek('prev')}
+            className="hover:scale-110 transition-all duration-200 hover:bg-blue-50 border-blue-200"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Претходна недела
+          </Button>
           
-          return (
-            <div key={index} className="border rounded-lg p-2 min-h-[120px] cursor-pointer hover:bg-gray-50 transition-colors"
-                 onClick={() => handleDayClick(day.getDate())}>
-              <div className={`text-center font-medium mb-2 ${
-                day.toDateString() === new Date().toDateString() 
-                  ? 'text-blue-600 bg-blue-50 rounded px-2 py-1' 
-                  : ''
-              }`}>
-                <div className="text-xs text-gray-500">{dayNames[index]}</div>
-                <div>{day.getDate()}</div>
-              </div>
-              <div className="space-y-1">
-                {dayEvents.map(event => (
-                  <div
-                    key={event.id}
-                    className="text-xs p-1 rounded text-white truncate cursor-pointer hover:opacity-80"
-                    style={{ backgroundColor: event.color }}
-                    onClick={(e) => handleEventClick(event, e)}
-                  >
-                    {event.time}
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-gray-800">
+              {weekDays[0].getDate()} {monthNames[weekDays[0].getMonth()]} - {weekDays[6].getDate()} {monthNames[weekDays[6].getMonth()]} {weekDays[0].getFullYear()}
+            </h3>
+          </div>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigateWeek('next')}
+            className="hover:scale-110 transition-all duration-200 hover:bg-blue-50 border-blue-200"
+          >
+            Следна недела
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+
+        {/* Week grid */}
+        <div className="grid grid-cols-7 gap-2">
+          {weekDays.map((day, index) => {
+            const dayEvents = events.filter(event => {
+              const eventDate = new Date(event.date);
+              return eventDate.toDateString() === day.toDateString();
+            });
+            
+            const isCurrentDay = day.toDateString() === new Date().toDateString();
+            
+            return (
+              <div key={index} className={`border rounded-lg p-3 min-h-[140px] cursor-pointer hover:shadow-md transition-all duration-200 ${
+                isCurrentDay ? 'bg-blue-50 border-blue-300 shadow-sm' : 'hover:bg-gray-50 border-gray-200'
+              }`}
+                   onClick={() => handleDayClick(day)}>
+                <div className={`text-center font-medium mb-3 ${
+                  isCurrentDay ? 'text-blue-600' : 'text-gray-700'
+                }`}>
+                  <div className="text-xs text-gray-500 mb-1">{dayNames[index]}</div>
+                  <div className={`text-lg font-bold ${isCurrentDay ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : ''}`}>
+                    {day.getDate()}
                   </div>
-                ))}
+                </div>
+                <div className="space-y-1">
+                  {dayEvents.slice(0, 3).map(event => (
+                    <div
+                      key={event.id}
+                      className="text-xs p-2 rounded text-white truncate cursor-pointer hover:opacity-80 transition-opacity shadow-sm"
+                      style={{ backgroundColor: event.color }}
+                      onClick={(e) => handleEventClick(event, e)}
+                    >
+                      <div className="font-medium">{event.title}</div>
+                      <div className="text-xs opacity-90">{event.time}</div>
+                    </div>
+                  ))}
+                  {dayEvents.length > 3 && (
+                    <div className="text-xs text-gray-500 text-center bg-gray-100 rounded p-1">
+                      +{dayEvents.length - 3} повеќе
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     );
   };
@@ -315,32 +396,46 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
     );
   };
 
+  const getHeaderTitle = () => {
+    if (view === 'week') {
+      const weekDays = getWeekDates();
+      if (weekDays[0].getMonth() === weekDays[6].getMonth()) {
+        return `${monthNames[weekDays[0].getMonth()]} ${weekDays[0].getFullYear()}`;
+      } else {
+        return `${monthNames[weekDays[0].getMonth()]} - ${monthNames[weekDays[6].getMonth()]} ${weekDays[0].getFullYear()}`;
+      }
+    }
+    return `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+  };
+
   return (
     <>
       <Card className="w-full">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <CardTitle className="text-xl sm:text-2xl font-bold">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+              {getHeaderTitle()}
             </CardTitle>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigateMonth('prev')}
-                className="hover:scale-110 transition-transform"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigateMonth('next')}
-                className="hover:scale-110 transition-transform"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+            {view !== 'week' && (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateMonth('prev')}
+                  className="hover:scale-110 transition-transform"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateMonth('next')}
+                  className="hover:scale-110 transition-transform"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -423,6 +518,7 @@ const Calendar = ({ events, onCreateEvent, courses = [], onAddStudentToCourse }:
         isOpen={isCourseModalOpen}
         onClose={() => setIsCourseModalOpen(false)}
         onAddStudent={handleAddStudentToCourse}
+        onRemoveStudent={handleRemoveStudentFromCourse}
       />
     </>
   );
