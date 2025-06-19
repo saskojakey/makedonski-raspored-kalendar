@@ -14,6 +14,7 @@ import {
   BookOpen,
   Plus
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface MobileSidebarProps {
   currentView: string;
@@ -33,6 +34,7 @@ const MobileSidebar = ({
   courses 
 }: MobileSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleNavigate = (view: string) => {
     onNavigate(view);
@@ -42,26 +44,26 @@ const MobileSidebar = ({
   const menuItems = [
     {
       id: 'calendar',
-      label: 'Мој Календар',
+      label: t('myCalendar'),
       icon: Calendar,
       active: currentView === 'calendar'
     },
     {
       id: 'today',
-      label: 'Денешни Часови',
+      label: t('todayClasses'),
       icon: Clock,
       active: currentView === 'today'
     },
     {
       id: 'notifications',
-      label: 'Известувања',
+      label: t('notifications'),
       icon: Bell,
       badge: unreadNotifications,
       active: currentView === 'notifications'
     },
     {
       id: 'profile',
-      label: 'Мој Профил',
+      label: t('myProfile'),
       icon: User,
       active: currentView === 'profile'
     }
@@ -87,7 +89,7 @@ const MobileSidebar = ({
               </div>
               <div>
                 <SheetTitle className="text-white text-left">{userName}</SheetTitle>
-                <p className="text-blue-100 text-sm">{userRole === 'student' ? 'Ученик' : 'Наставник'}</p>
+                <p className="text-blue-100 text-sm">{userRole === 'student' ? t('student') : t('teacher')}</p>
               </div>
             </div>
           </SheetHeader>
@@ -95,7 +97,7 @@ const MobileSidebar = ({
           <div className="flex-1 p-4 space-y-6">
             {/* Main Navigation */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 mb-3 px-2">Главно Мени</h3>
+              <h3 className="text-sm font-semibold text-gray-600 mb-3 px-2">{t('mainMenu')}</h3>
               <div className="space-y-1">
                 {menuItems.map((item) => {
                   const Icon = item.icon;
@@ -133,7 +135,7 @@ const MobileSidebar = ({
 
             {/* Quick Actions */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 mb-3 px-2">Брзи Акции</h3>
+              <h3 className="text-sm font-semibold text-gray-600 mb-3 px-2">{t('quickActions')}</h3>
               <div className="space-y-2">
                 <Button
                   variant="outline"
@@ -141,14 +143,14 @@ const MobileSidebar = ({
                   onClick={() => handleNavigate('create')}
                 >
                   <Plus className="h-5 w-5 mr-3 text-green-600" />
-                  <span>Создај Нов Курс</span>
+                  <span>{t('createNewCourse')}</span>
                 </Button>
               </div>
             </div>
 
             {/* My Courses */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 mb-3 px-2">Мои Курсеви</h3>
+              <h3 className="text-sm font-semibold text-gray-600 mb-3 px-2">{t('myCourses')}</h3>
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {courses.map(course => (
                   <div
@@ -161,14 +163,14 @@ const MobileSidebar = ({
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{course.name}</p>
-                      <p className="text-xs text-gray-500">{course.students.length} студенти</p>
+                      <p className="text-xs text-gray-500">{course.students.length} {t('students')}</p>
                     </div>
                   </div>
                 ))}
                 {courses.length === 0 && (
                   <div className="text-center py-6 text-gray-500">
                     <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Немате креирано курсеви</p>
+                    <p className="text-sm">{t('noCoursesCreated')}</p>
                   </div>
                 )}
               </div>
@@ -183,7 +185,7 @@ const MobileSidebar = ({
               onClick={() => handleNavigate('settings')}
             >
               <Settings className="h-5 w-5 mr-3" />
-              <span>Поставки</span>
+              <span>{t('settings')}</span>
             </Button>
           </div>
         </div>

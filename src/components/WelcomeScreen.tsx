@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, ArrowRight } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface WelcomeScreenProps {
   phoneNumber: string;
@@ -11,6 +12,7 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen = ({ phoneNumber, onContinue }: WelcomeScreenProps) => {
   const [showButton, setShowButton] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,7 +29,7 @@ const WelcomeScreen = ({ phoneNumber, onContinue }: WelcomeScreenProps) => {
             <div className="relative mx-auto w-20 h-20">
               <img 
                 src="/lovable-uploads/fe60a9bb-9daf-411c-b439-53d4805a9306.png" 
-                alt="TaskFlow Logo" 
+                alt={t('appName')}
                 className="w-full h-full rounded-2xl shadow-lg"
               />
               <CheckCircle className="absolute -bottom-1 -right-1 h-8 w-8 text-green-500 bg-white rounded-full p-1 shadow-md" />
@@ -36,10 +38,10 @@ const WelcomeScreen = ({ phoneNumber, onContinue }: WelcomeScreenProps) => {
           
           <div className="space-y-2">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Добредојдовте во TaskFlow! 🎉
+              {t('appWelcome')}
             </h1>
             <p className="text-gray-600">
-              Вашиот нов организатор за задачи е подготвен
+              {t('appSubtitle')}
             </p>
             <p className="text-sm text-gray-500">
               {phoneNumber}
@@ -52,7 +54,7 @@ const WelcomeScreen = ({ phoneNumber, onContinue }: WelcomeScreenProps) => {
               size="lg"
               className="w-full animate-pulse hover:animate-none hover:scale-105 transition-all duration-300 bg-gradient-to-r from-blue-500 via-blue-600 to-green-500 hover:from-blue-600 hover:via-blue-700 hover:to-green-600 shadow-lg"
             >
-              Почни да го користиш
+              {t('startUsing')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           )}

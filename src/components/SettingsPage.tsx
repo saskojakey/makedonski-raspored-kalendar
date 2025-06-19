@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Globe, Bell, Monitor, Sun, Moon } from 'lucide-react';
 import { UserProfile } from '@/types';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface SettingsPageProps {
   onBack: () => void;
@@ -17,6 +18,7 @@ interface SettingsPageProps {
 const SettingsPage = ({ onBack, userProfile, language, onLanguageChange }: SettingsPageProps) => {
   const [notifications, setNotifications] = React.useState(true);
   const [darkMode, setDarkMode] = React.useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -25,7 +27,7 @@ const SettingsPage = ({ onBack, userProfile, language, onLanguageChange }: Setti
           <Button variant="ghost" onClick={onBack} className="hover:scale-105 transition-transform">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">Подесувања</h1>
+          <h1 className="text-2xl font-bold">{t('settings')}</h1>
         </div>
 
         <div className="space-y-6">
@@ -33,14 +35,14 @@ const SettingsPage = ({ onBack, userProfile, language, onLanguageChange }: Setti
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Јазик и регион
+                {t('languageAndRegion')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Јазик на апликацијата</p>
-                  <p className="text-sm text-muted-foreground">Избери го твојот претпочитан јазик</p>
+                  <p className="font-medium">{t('appLanguage')}</p>
+                  <p className="text-sm text-muted-foreground">{t('selectPreferredLanguage')}</p>
                 </div>
                 <Select value={language} onValueChange={onLanguageChange}>
                   <SelectTrigger className="w-40">
@@ -60,30 +62,30 @@ const SettingsPage = ({ onBack, userProfile, language, onLanguageChange }: Setti
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Известувања
+                {t('notifications')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Push известувања</p>
-                  <p className="text-sm text-muted-foreground">Добивај известувања за важни настани</p>
+                  <p className="font-medium">{t('pushNotifications')}</p>
+                  <p className="text-sm text-muted-foreground">{t('receiveImportantNotifications')}</p>
                 </div>
                 <Switch checked={notifications} onCheckedChange={setNotifications} />
               </div>
               
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Email известувања</p>
-                  <p className="text-sm text-muted-foreground">Добивај дневни резимеа на email</p>
+                  <p className="font-medium">{t('emailNotifications')}</p>
+                  <p className="text-sm text-muted-foreground">{t('receiveDailySummaries')}</p>
                 </div>
                 <Switch checked={false} onCheckedChange={() => {}} />
               </div>
               
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">SMS потсетници</p>
-                  <p className="text-sm text-muted-foreground">Потсетници пред часовите</p>
+                  <p className="font-medium">{t('smsReminders')}</p>
+                  <p className="text-sm text-muted-foreground">{t('remindersBeforeClasses')}</p>
                 </div>
                 <Switch checked={true} onCheckedChange={() => {}} />
               </div>
@@ -94,22 +96,22 @@ const SettingsPage = ({ onBack, userProfile, language, onLanguageChange }: Setti
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Monitor className="h-5 w-5" />
-                Изглед и тема
+                {t('appearanceAndTheme')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Темна тема</p>
-                  <p className="text-sm text-muted-foreground">Префрли кон темен режим</p>
+                  <p className="font-medium">{t('darkTheme')}</p>
+                  <p className="text-sm text-muted-foreground">{t('switchToDarkMode')}</p>
                 </div>
                 <Switch checked={darkMode} onCheckedChange={setDarkMode} />
               </div>
               
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Компактен приказ</p>
-                  <p className="text-sm text-muted-foreground">Прикажи повеќе содржина на екранот</p>
+                  <p className="font-medium">{t('compactView')}</p>
+                  <p className="text-sm text-muted-foreground">{t('showMoreContent')}</p>
                 </div>
                 <Switch checked={false} onCheckedChange={() => {}} />
               </div>
@@ -118,24 +120,24 @@ const SettingsPage = ({ onBack, userProfile, language, onLanguageChange }: Setti
 
           <Card>
             <CardHeader>
-              <CardTitle>Кориснички профил</CardTitle>
+              <CardTitle>{t('userProfile')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Име</p>
+                  <p className="text-muted-foreground">{t('name')}</p>
                   <p className="font-medium">{userProfile.name}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Улога</p>
-                  <p className="font-medium">{userProfile.role === 'teacher' ? 'Наставник' : 'Студент'}</p>
+                  <p className="text-muted-foreground">{t('role')}</p>
+                  <p className="font-medium">{userProfile.role === 'teacher' ? t('teacher') : t('student')}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Училиште</p>
+                  <p className="text-muted-foreground">{t('school')}</p>
                   <p className="font-medium">{userProfile.school}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Класа/Година</p>
+                  <p className="text-muted-foreground">{t('classYear')}</p>
                   <p className="font-medium">{userProfile.yearGrade}</p>
                 </div>
               </div>

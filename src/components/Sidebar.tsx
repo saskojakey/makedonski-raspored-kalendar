@@ -28,11 +28,11 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
         <div className="flex items-center gap-3 mb-6">
           <img 
             src="/lovable-uploads/fe60a9bb-9daf-411c-b439-53d4805a9306.png" 
-            alt="TaskFlow" 
+            alt={t('appName')}
             className="h-8 w-8 rounded-lg"
           />
           <h2 className="text-lg font-semibold taskflow-text-gradient">
-            TaskFlow
+            {t('appName')}
           </h2>
         </div>
 
@@ -61,7 +61,7 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
                     <h3 className="font-medium text-sm text-blue-900">{course.name}</h3>
                     <p className="text-xs text-blue-600 flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
-                      {course.students.length} студенти
+                      {course.students.length} {t('students')}
                     </p>
                   </div>
                 </div>
@@ -71,7 +71,7 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
               <div className="text-center py-8 bg-white/50 rounded-lg border border-blue-200">
                 <Calendar className="h-8 w-8 mx-auto mb-2 text-blue-400" />
                 <p className="text-sm text-blue-600">
-                  Немате креирано курсеви
+                  {t('noCoursesCreated')}
                 </p>
               </div>
             )}
@@ -87,19 +87,19 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
             <div className="text-xs p-3 bg-white rounded-lg border border-green-200 shadow-sm">
               <div className="flex items-center gap-2 text-green-700">
                 <CheckCircle className="h-3 w-3" />
-                Понеделник - Математика (10:00)
+                {t('monday')} - {t('mathematics')} (10:00)
               </div>
             </div>
             <div className="text-xs p-3 bg-white rounded-lg border border-green-200 shadow-sm">
               <div className="flex items-center gap-2 text-green-700">
                 <CheckCircle className="h-3 w-3" />
-                Среда - Историја (14:00)
+                {t('wednesday')} - {t('history')} (14:00)
               </div>
             </div>
             <div className="text-xs p-3 bg-white rounded-lg border border-green-200 shadow-sm">
               <div className="flex items-center gap-2 text-green-700">
                 <CheckCircle className="h-3 w-3" />
-                Петок - Биологија (11:30)
+                {t('friday')} - {t('biology')} (11:30)
               </div>
             </div>
           </div>
@@ -108,21 +108,21 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId }: SidebarProps) =>
         <div>
           <h3 className="text-sm font-medium mb-3 flex items-center gap-2 text-red-600">
             <Bell className="h-4 w-4" />
-            Известувања
+            {t('notifications')}
           </h3>
           <div className="space-y-2">
             <div className="text-xs p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-3 w-3 text-blue-500" />
                 <span className="font-medium text-blue-700">Марко П.</span>
-                <span className="text-blue-600">прифати покана за Математика</span>
+                <span className="text-blue-600">прифати покана за {t('mathematics')}</span>
               </div>
             </div>
             <div className="text-xs p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-3 w-3 text-green-500" />
                 <span className="font-medium text-green-700">Ана С.</span>
-                <span className="text-green-600">прифати покана за Историја</span>
+                <span className="text-green-600">прифати покана за {t('history')}</span>
               </div>
             </div>
           </div>

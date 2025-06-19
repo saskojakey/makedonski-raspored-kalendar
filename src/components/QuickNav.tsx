@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Bell, User, Home, Plus } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface QuickNavProps {
   onNavigate: (view: string) => void;
@@ -12,30 +13,32 @@ interface QuickNavProps {
 }
 
 const QuickNav = ({ onNavigate, currentView, todayEventCount, unreadNotifications }: QuickNavProps) => {
+  const { t } = useTranslation();
+
   const navItems = [
     {
       id: 'calendar',
-      label: 'Календар',
+      label: t('calendar'),
       icon: Calendar,
       active: currentView === 'calendar'
     },
     {
       id: 'today',
-      label: 'Денес',
+      label: t('today'),
       icon: Clock,
       badge: todayEventCount,
       active: currentView === 'today'
     },
     {
       id: 'notifications',
-      label: 'Известувања',
+      label: t('notifications'),
       icon: Bell,
       badge: unreadNotifications,
       active: currentView === 'notifications'
     },
     {
       id: 'profile',
-      label: 'Профил',
+      label: t('profile'),
       icon: User,
       active: currentView === 'profile'
     }
@@ -79,7 +82,7 @@ const QuickNav = ({ onNavigate, currentView, todayEventCount, unreadNotification
           className="flex flex-col items-center gap-1 h-auto py-2 px-3 bg-primary hover:bg-primary/90 hover:scale-110 transition-transform"
         >
           <Plus className="h-5 w-5" />
-          <span className="text-xs">Додај</span>
+          <span className="text-xs">{t('add')}</span>
         </Button>
       </div>
     </div>

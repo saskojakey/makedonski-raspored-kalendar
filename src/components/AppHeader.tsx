@@ -6,6 +6,7 @@ import { Settings, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { UserProfile } from '@/types';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface AppHeaderProps {
   userProfile: UserProfile;
@@ -22,6 +23,8 @@ const AppHeader = ({
   onLanguageChange, 
   onNavigate 
 }: AppHeaderProps) => {
+  const { t } = useTranslation();
+
   return (
     <header className="bg-gradient-to-r from-blue-500 via-blue-600 to-green-500 border-b border-blue-300 px-6 py-4 shadow-lg">
       <div className="flex items-center justify-between">
@@ -29,15 +32,15 @@ const AppHeader = ({
           <div className="flex items-center gap-3">
             <img 
               src="/lovable-uploads/fe60a9bb-9daf-411c-b439-53d4805a9306.png" 
-              alt="TaskFlow Logo" 
+              alt={t('appName')}
               className="h-10 w-10 rounded-lg shadow-md"
             />
             <div>
               <h1 className="text-2xl font-bold text-white drop-shadow-sm">
-                TaskFlow
+                {t('appName')}
               </h1>
               <p className="text-sm text-blue-100">
-                Добредојдовте, {userProfile.name}
+                {t('welcomeUser', { name: userProfile.name })}
               </p>
             </div>
           </div>
