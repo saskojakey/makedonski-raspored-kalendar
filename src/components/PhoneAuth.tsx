@@ -34,7 +34,7 @@ const PhoneAuth = ({ onAuthSuccess }: PhoneAuthProps) => {
           <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
             <Phone className="h-8 w-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold">EduКалендар</CardTitle>
+          <CardTitle className="text-2xl font-bold">Мој Распоред</CardTitle>
           <CardDescription>
             Внесете го вашиот телефонски број за да продолжите
           </CardDescription>

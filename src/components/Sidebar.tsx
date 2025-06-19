@@ -39,7 +39,6 @@ const Sidebar = ({ courses, onCourseSelect, selectedCourseId, onAddStudentToCour
     <div className="h-full flex flex-col">
       <div className="p-4 border-b">
         <div className="flex items-center justify-between lg:justify-start">
-          <h2 className="text-lg font-semibold text-gray-800">{t('navigation')}</h2>
           <Button
             variant="ghost"
             size="sm"

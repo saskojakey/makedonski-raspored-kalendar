@@ -33,7 +33,7 @@ const AppHeader = ({
             <img 
               src="/lovable-uploads/fe60a9bb-9daf-411c-b439-53d4805a9306.png" 
               alt={t('appName')}
-              className="h-10 w-10 rounded-lg shadow-md"
+              className="h-10 w-10 rounded-lg "
             />
             <div>
               <h1 className="text-2xl font-bold text-white drop-shadow-sm">
